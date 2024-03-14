@@ -56,7 +56,7 @@ export async function callClaudeWorker(prompt) {
 const __filename = fileURLToPath(import.meta.url);
 
 // The directory containing the TypeScript/JavaScript files
-const directoryPath = path.join(process.cwd(), 'src');
+const directoryPath = process.cwd();
 
 // Function to recursively read through directories and process .ts, .js, .tsx, .jsx files
 const processDirectory = async (dirPath) => {
@@ -131,7 +131,7 @@ Once you've rewritten the code, respond with the complete markdown JS code block
   console.log(`File rewritten: ${filePath}`)
 }
 
-// Start processing from the root TypeScript/JavaScript directory
+// Start processing from the current working directory
 processDirectory(directoryPath)
   .then(() => {
     console.log('Code rewriting completed.')
