@@ -8,7 +8,9 @@ import dotenv from 'dotenv';
 
 import pocketCodebase from './concatenated-output.mjs';
 
-dotenv.config('.dev.vars');
+dotenv.config({
+  path: path.join(process.cwd(), '.dev.vars')
+});
 
 const cloudflareWorkerUrl = process.env.CLOUDFLARE_WORKER_URL || 'https://ai-proxy.shawmakesmagic.workers.dev';
 
@@ -63,6 +65,11 @@ const processDirectory = async (dirPath) => {
   for (const file of files) {
     const filePath = path.join(dirPath, file)
     const stat = fs.statSync(filePath)
+
+    // if the path includes node_modules, skip it
+    if (filePath.includes('node_modules')) {
+      continue;
+    }
 
     if (stat.isDirectory()) {
       // Recursively process subdirectories
