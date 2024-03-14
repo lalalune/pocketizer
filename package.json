@@ -1,6 +1,6 @@
 {
     "name": "pocketizer",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "A tool to rewrite code to use Pocket JS instead of other web3 providers",
     "main": "src/index.mjs",
     "bin": {

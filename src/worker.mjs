@@ -20,7 +20,7 @@ export default {
       anthropic.messages.stream({
         max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
-        model: 'claude-3-sonnet-20240229',
+        model: 'claude-3-haiku-20240229',
       })
         .on('text', (text) => {
           const encoder = new TextEncoder();

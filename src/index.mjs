@@ -4,8 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
 import { fileURLToPath } from 'url';
-import pocketCodebase from './concatenated-output.mjs';
+// import pocketCodebase from './concatenated-output.mjs';
 
+const pocketCodebase = "";
 import { exec } from 'child_process';
 import dotenv from 'dotenv';
 import { promisify } from 'util';
@@ -18,7 +19,7 @@ dotenv.config({
   path: path.join(process.cwd(), '.dev.vars')
 });
 
-const cloudflareWorkerUrl = process.env.CLOUDFLARE_WORKER_URL || 'https://ai-proxy.shawmakesmagic.workers.dev';
+const cloudflareWorkerUrl = process.env.CLOUDFLARE_WORKER_URL || 'http://127.0.0.1:7998' // 'https://ai-proxy.shawmakesmagic.workers.dev';
 
 async function callClaudeWorker(prompt) {
   try {
@@ -108,7 +109,10 @@ const processDirectory = async (dirPath) => {
     const stat = fs.statSync(filePath)
 
     // if the path includes node_modules, skip it
-    if (filePath.includes('node_modules')) {
+    if (filePath.includes('node_modules') ||
+    // ignore .config.js
+    filePath.includes('.config.js')
+    ) {
       continue;
     }
 
@@ -120,7 +124,7 @@ const processDirectory = async (dirPath) => {
       const content = fs.readFileSync(filePath, 'utf8')
 
       // Check if the file contains calls to Infura, Alchemy, ethers.js, or web3.js
-      if ((content.includes('infura') || content.includes('alchemy') || content.includes('@alch') || content.includes('ethers') || content.includes('web3')) && !content.includes('@pocketizer-ignore-file')) {
+      if ((content.includes('alchemy') || content.includes('@alch') || content.includes('infura') || content.includes('wagmi') || content.includes('ethers')) && !content.includes('@pocketizer-ignore-file')) {
         // Add the file to the queue for rewriting
         await rewriteFileUsingPocketJS(filePath, content)
       }
@@ -134,17 +138,18 @@ const rewriteFileUsingPocketJS = async (filePath, content) => {
 
   // Prepare the prompt for the Claude API
   let prompt = `${pocketCodebase}\n
-  Please rewrite the following code to use Pocket JS instead of Infura, Alchemy, ethers.js, or web3.js:
+  Please rewrite the following code to use Pocket JS instead of Alchemy:
 
 \`\`\`
 ${content}
 \`\`\`
 
 First, describe the steps to rewrite the code.
-Replace all calls to other web3 providers with Pocket JS.
+Replace all calls to other web3 providers with Pocket JS that can be replaced. Specifically, look for calls to Alchemy, Infura, ethers.js, wagmi or web3.js, as well as any other provider-specific code.
 Next, compile all the rewritten code into a complete file.
 Then write it out as a single markdown JS code block, along with all the necessary imports and exports.
-Once you've rewritten the code, respond with the complete markdown JS code block. No need for additional commentary or explanation after that.`
+Once you've rewritten the code, respond with the complete markdown JS code block. No need for additional commentary or explanation after that.
+If it doesn't make sense to change this code or no code changes are necessary, respond with "No changes needed" and no code blocks.`
 
   const response = await callClaudeWorker(prompt)
 
