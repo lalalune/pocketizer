@@ -1,0 +1,29 @@
+{
+    "name": "pocketizer",
+    "version": "0.0.1",
+    "description": "A tool to rewrite code to use Pocket JS instead of other web3 providers",
+    "main": "src/index.mjs",
+    "bin": {
+        "pocketizer": "src/index.mjs"
+    },
+    "scripts": {
+        "start": "node src/index.mjs",
+        "worker:start": "npx wrangler dev",
+        "deploy": "npx wrangler publish"
+    },
+    "keywords": [
+        "pocket",
+        "pocket-js",
+        "web3",
+        "ethereum",
+        "blockchain"
+    ],
+    "author": "Moon",
+    "license": "MIT",
+    "dependencies": {
+        "@anthropic-ai/sdk": "^0.18.0",
+        "@pokt-network/pocket-js": "^0.9.2-rc",
+        "dotenv": "^16.0.0"
+    },
+    "type": "module"
+}

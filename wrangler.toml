@@ -1,0 +1,9 @@
+name = "ai-proxy"
+main = "src/worker.mjs"
+compatibility_date = "2023-11-21"
+node_compat = true
+
+[dev]
+port = 7998
+
+# add 
