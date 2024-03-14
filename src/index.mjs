@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 // @pocketizer-ignore-file
-
 import fs from 'fs';
 import path from 'path';
+import readline from 'readline';
 import { fileURLToPath } from 'url';
+import pocketCodebase from './concatenated-output.mjs';
 
+import { exec } from 'child_process';
 import dotenv from 'dotenv';
+import { promisify } from 'util';
 
-// import pocketCodebase from './concatenated-output.mjs';
+const execAsync = promisify(exec);
 
-const pocketCodebase = "";
+async function run(){
 
 dotenv.config({
   path: path.join(process.cwd(), '.dev.vars')
@@ -17,7 +20,7 @@ dotenv.config({
 
 const cloudflareWorkerUrl = process.env.CLOUDFLARE_WORKER_URL || 'https://ai-proxy.shawmakesmagic.workers.dev';
 
-export async function callClaudeWorker(prompt) {
+async function callClaudeWorker(prompt) {
   try {
     let finalResponse = '';
 
@@ -52,6 +55,41 @@ export async function callClaudeWorker(prompt) {
   } catch (error) {
     console.error('Error calling Claude API:', error);
     throw error;
+  }
+}
+
+// Function to prompt the user for confirmation
+async function promptConfirmation(message) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  return new Promise((resolve) => {
+    rl.question(`${message} (yes/no) `, (answer) => {
+      rl.close();
+      resolve(answer.trim().toLowerCase() === 'yes');
+    });
+  });
+}
+
+// Check if the current directory is a git repository
+async function isGitRepository() {
+  try {
+    await execAsync('git rev-parse --is-inside-work-tree');
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+// Check if there are uncommitted changes in the git repository
+async function hasUncommittedChanges() {
+  try {
+    const { stdout } = await execAsync('git status --porcelain');
+    return stdout.trim() !== '';
+  } catch (error) {
+    return false;
   }
 }
 
@@ -134,6 +172,28 @@ Once you've rewritten the code, respond with the complete markdown JS code block
   console.log(`File rewritten: ${filePath}`)
 }
 
+const isGitRepo = await isGitRepository();
+
+if (!isGitRepo) {
+  const continueWithoutGit = await promptConfirmation(
+    'Warning: The current directory is not a git repository. Are you sure you want to continue?'
+  );
+  if (!continueWithoutGit) {
+    console.log('Aborting the process.');
+    process.exit(0);
+  }
+} else {
+  const hasChanges = await hasUncommittedChanges();
+  if (hasChanges) {
+    const continueWithChanges = await promptConfirmation(
+      'Warning: There are uncommitted changes in the git repository. This process is destructive. Are you sure you want to continue?'
+    );
+    if (!continueWithChanges) {
+      console.log('Aborting the process.');
+      process.exit(0);
+    }
+  }
+}
 // Start processing from the current working directory
 processDirectory(directoryPath)
   .then(() => {
@@ -142,3 +202,5 @@ processDirectory(directoryPath)
   .catch((error) => {
     console.error('An error occurred:', error)
   })
+}
+run();
