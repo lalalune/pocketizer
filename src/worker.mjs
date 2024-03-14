@@ -15,6 +15,7 @@ export default {
       });
 
       const { readable, writable } = new TransformStream();
+      const writer = writable.getWriter();
 
       anthropic.messages.stream({
         max_tokens: 4096,
@@ -24,19 +25,19 @@ export default {
         .on('text', (text) => {
           const encoder = new TextEncoder();
           const chunk = encoder.encode(text);
-          writable.getWriter().write(chunk);
+          writer.write(chunk);
         })
         .on('finalMessage', (message) => {
           console.log('\n*** Final response:', message);
-          writable.getWriter().close();
+          writer.close();
         })
         .on('end', (message) => {
           console.log('\n*** end response:', message);
-          writable.getWriter().close();
+          writer.close();
         })
         .on('error', (error) => {
           console.error('Streaming error:', error);
-          writable.getWriter().abort(error);
+          writer.abort(error);
         });
 
       return new Response(readable, {

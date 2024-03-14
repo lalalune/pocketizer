@@ -7,7 +7,9 @@ import { fileURLToPath } from 'url';
 
 import dotenv from 'dotenv';
 
-import pocketCodebase from './concatenated-output.mjs';
+// import pocketCodebase from './concatenated-output.mjs';
+
+const pocketCodebase = "";
 
 dotenv.config({
   path: path.join(process.cwd(), '.dev.vars')
