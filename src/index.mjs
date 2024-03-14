@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // @pocketizer-ignore-file
 
 import fs from 'fs';
