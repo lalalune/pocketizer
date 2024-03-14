@@ -4,9 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
 import { fileURLToPath } from 'url';
-// import pocketCodebase from './concatenated-output.mjs';
+import pocketCodebase from './concatenated-output.mjs';
 
-const pocketCodebase = "";
+// const pocketCodebase = "";
 import { exec } from 'child_process';
 import dotenv from 'dotenv';
 import { promisify } from 'util';
@@ -19,7 +19,7 @@ dotenv.config({
   path: path.join(process.cwd(), '.dev.vars')
 });
 
-const cloudflareWorkerUrl = process.env.CLOUDFLARE_WORKER_URL || 'http://127.0.0.1:7998' // 'https://ai-proxy.shawmakesmagic.workers.dev';
+const cloudflareWorkerUrl = process.env.CLOUDFLARE_WORKER_URL || 'https://ai-proxy.shawmakesmagic.workers.dev';
 
 async function callClaudeWorker(prompt) {
   try {
