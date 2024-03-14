@@ -10,7 +10,7 @@ import path from 'path';
 import readline from 'readline';
 import { fileURLToPath } from 'url';
 import { promisify } from 'util';
-import pocketCodebase from './pocketCodebase.js';
+import pocketCodebase from './pocketCodebase.mjs';
 
 const execAsync = promisify(exec);
 
