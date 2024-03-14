@@ -23,3 +23,6 @@ cp .dev.vars.example .dev.vars
 ```bash
 npm install
 ```
+
+#### Deployment
+The API key for Claude is hidden behind a Cloudflare worker. To deploy the worker, run `npx wrangler deploy`. You will then need to set the environment variable for CLOUDFLARE_WORKER_URL to your new worker URL.
